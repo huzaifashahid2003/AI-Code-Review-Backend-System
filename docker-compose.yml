@@ -1,0 +1,46 @@
+services:
+
+  # ── Backend + built frontend ─────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: final
+    container_name: codesentinel
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env                  # Groq_API and Github_token loaded from here
+    environment:
+      - PORT=8000
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - uploads_data:/app/uploads   # persist uploaded files across restarts
+    healthcheck:
+      test: ["CMD", "curl", "-f", "--silent", "--max-time", "5", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # ── Frontend dev server (optional, for local development) ─
+  ui-dev:
+    image: node:20-alpine
+    container_name: codesentinel-ui-dev
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host"
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./ui:/app
+      - /app/node_modules          # anonymous volume prevents host override
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - app
+    profiles:
+      - dev                        # only starts with: docker compose --profile dev up
+
+volumes:
+  uploads_data:
