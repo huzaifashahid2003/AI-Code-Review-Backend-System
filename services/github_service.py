@@ -5,14 +5,17 @@ from dotenv import load_dotenv
 
 
 load_dotenv()
-TOKEN = os.getenv("Github_token")
+
+def _get_token():
+    """Read token at call time so updates via /settings are always picked up."""
+    return os.getenv("Github_token", "")
 
 def _gh_headers():
-    return {"Authorization": f"Bearer {TOKEN}", "Accept": "application/vnd.github+json"}
+    return {"Authorization": f"Bearer {_get_token()}", "Accept": "application/vnd.github+json"}
 
 def get_github_status():
     """Return connection status, authenticated user info, repos, and open PRs."""
-    if not TOKEN:
+    if not _get_token():
         return {"connected": False, "login": None, "repos": [], "prs": []}
 
     try:
@@ -83,10 +86,7 @@ def fetch_file_from_github(url):
 def post_commit_comment(repo, commit_sha, comment):
     url = f"https://api.github.com/repos/{repo}/commits/{commit_sha}/comments"
     
-    headers = {
-        "Authorization": f"Bearer {TOKEN}",
-        "Accept": "application/vnd.github+json",
-    }
+    headers = _gh_headers()
     data = {
         "body": comment
         }
@@ -155,10 +155,7 @@ async def handle_github_event(payload):
 
 def get_pr_file(repo, pr_number):
     url = f"https://api.github.com/repos/{repo}/pulls/{pr_number}/files"
-    headers={
-        "Authorization": f"Bearer {TOKEN}",
-        "Accept":"application/vnd.github+json"
-    }
+    headers = _gh_headers()
     response = safe_request(url, headers)
     if response.status_code != 200:
         raise Exception(f"GitHub API error: {response.status_code}")
@@ -178,10 +175,7 @@ def get_pr_file(repo, pr_number):
 def post_pr_comment(repo, pr_number, comment):
     url=f"https://api.github.com/repos/{repo}/issues/{pr_number}/comments"
 
-    headers={
-        "Authorization":f"Bearer {TOKEN}",
-        "Accept":"application/vnd.github+json",
-    }
+    headers = _gh_headers()
     data={
         "body":comment
     }
@@ -193,6 +187,16 @@ def post_pr_comment(repo, pr_number, comment):
     
     return response.json()
 
+
+
+def get_pr_diff(repo, pr_number):
+    """Return all files in a PR with their unified diff patch."""
+    url = f"https://api.github.com/repos/{repo}/pulls/{pr_number}/files"
+    response = safe_request(url, _gh_headers())
+    return [
+        {"filename": f["filename"], "patch": f.get("patch", "")}
+        for f in response.json()
+    ]
 
 
 def safe_request(url,headers):

@@ -79,11 +79,13 @@ export default function App() {
     setScreen('step-fix')
   }
 
-  const handleOpenPR = (pr) => {
+ const handleOpenPR = (pr) => {
+    console.log("PR data:", pr)
+    console.log("Screen:", screen)
     setSelectedPR(pr)
     setScreen('pr-review')
-  }
-
+    console.log("Screen set to pr-review")
+}
   const renderContent = () => {
     switch (screen) {
       case 'dashboard':
@@ -124,7 +126,7 @@ export default function App() {
         return <GithubIntegration onOpenPR={handleOpenPR} />
       case 'pr-review':
         return <PRReview pr={selectedPR} />
-      case 'settings':
+       case 'settings':
         return <Settings onGoToDashboard={() => navigate('dashboard')} />
       default:
         return <Dashboard stats={stats} onStartAnalysis={() => navigate('step-upload')} />
@@ -148,7 +150,7 @@ export default function App() {
             <div className="w-12 h-12 bg-blue-600/20 border border-blue-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <span className="text-2xl">🤖</span>
             </div>
-            <h1 className="text-2xl font-bold text-white">Welcome to AlphaCore AI</h1>
+            <h1 className="text-2xl font-bold text-white">Welcome to CodeSentinel AI</h1>
             <p className="text-sm text-[#5a5a72] mt-2">Paste your API keys to get started. These are saved to your local <code className="text-blue-400">.env</code> file.</p>
           </div>
           <Settings onGoToDashboard={() => navigate('dashboard')} />

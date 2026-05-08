@@ -6,7 +6,7 @@ import os
 import re
 import traceback
 from dotenv import load_dotenv
-from services.github_service import handle_github_event, get_github_status, get_pr_file
+from services.github_service import handle_github_event, get_github_status, get_pr_file, get_pr_diff
 from services.review_service import process_file, process_file_from_github, process_pr_files
 
 
@@ -132,15 +132,18 @@ async def review_pr(repo: str, pr_number: int):
     try:
         files = get_pr_file(repo, pr_number)
         if not files:
-            return{
-                "error":"No python files found"
-            }
+            return {"error": "No python files found"}
         results = await process_pr_files(files)
-        return{
-            "repo":repo,
-            "pr":pr_number,
-            "reviews":results
-        }
+        return {"repo": repo, "pr": pr_number, "reviews": results}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@app.get("/pr-diff")
+async def pr_diff(repo: str, pr_number: int):
+    try:
+        diff = get_pr_diff(repo, pr_number)
+        return {"repo": repo, "pr": pr_number, "diff": diff}
     except Exception as e:
         return {"error": str(e)}
           

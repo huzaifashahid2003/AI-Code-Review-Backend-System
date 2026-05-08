@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Copy, Download, CheckCircle, ArrowRight, Info, ArrowLeft } from 'lucide-react'
+import { downloadPythonFile } from '../../utils/downloadPy'
 
 export default function FixStep({ issue, onBack, onRerun }) {
   const [applied, setApplied] = useState(false)
@@ -120,7 +121,10 @@ export default function FixStep({ issue, onBack, onRerun }) {
           {applied ? 'Fix Applied' : 'Apply Fix to Code'}
         </button>
 
-        <button className="flex items-center gap-2 px-4 py-2.5 bg-[#1c1c26] border border-[#2a2a38] text-[#aaaacc] hover:text-white rounded-lg text-sm font-medium transition-colors">
+        <button
+          onClick={() => downloadPythonFile(issue?.fixed_code, issue?.function)}
+          className="flex items-center gap-2 px-4 py-2.5 bg-[#1c1c26] border border-[#2a2a38] text-[#aaaacc] hover:text-white rounded-lg text-sm font-medium transition-colors"
+        >
           <Download size={15} />
           Download Corrected File (.py)
         </button>

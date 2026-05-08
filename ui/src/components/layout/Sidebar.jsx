@@ -21,7 +21,7 @@ export default function Sidebar({ activeScreen, onNavigate }) {
           <Cpu size={16} className="text-white" />
         </div>
         <div>
-          <div className="text-sm font-semibold text-white leading-tight">AlphaCore</div>
+          <div className="text-sm font-semibold text-white leading-tight">CodeSentinel</div>
           <div className="text-[10px] text-[#5a5a72] leading-tight">AI Review</div>
         </div>
       </div>

@@ -13,6 +13,24 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 semaphore = asyncio.Semaphore(1)
 
+def _validate_fixed_code(original: str, fixed: str) -> str:
+    """Reject fixed_code if it looks hallucinated (too many added/changed lines)."""
+    if not fixed or fixed == original:
+        return original
+    orig_lines  = [l.strip() for l in original.splitlines() if l.strip()]
+    fixed_lines = [l.strip() for l in fixed.splitlines()   if l.strip()]
+    extra_lines = abs(len(fixed_lines) - len(orig_lines))
+    # Count lines that changed relative to original
+    changed = sum(
+        1 for a, b in zip(orig_lines, fixed_lines) if a != b
+    )
+    total = max(len(orig_lines), 1)
+    # Reject if more than 3 extra lines added OR more than 60% of lines changed
+    if extra_lines > 3 or changed / total > 0.6:
+        print(f"[validate] Rejected hallucinated fixed_code (extra={extra_lines}, changed_ratio={changed/total:.2f})")
+        return original
+    return fixed
+
 async def process_file(file):
     file_path=os.path.join(UPLOAD_DIR,file.filename)
 
@@ -43,7 +61,7 @@ async def review_single_function(func):
     return {
         "function": func["name"],
         "code": func["code"],
-        "fixed_code": ai_result.get("fixed_code", func["code"]),
+        "fixed_code": _validate_fixed_code(func["code"], ai_result.get("fixed_code", func["code"])),
         "line": func.get("line"),
         "review": {
             "issues": ai_result.get("issues", []),

@@ -25,7 +25,7 @@ export default function Navbar({ activeScreen }) {
       {/* Project selector */}
       <button className="flex items-center gap-2 px-3 py-1.5 bg-[#1c1c26] border border-[#2a2a38] rounded-lg text-sm text-white hover:border-[#3a3a4e] transition-colors">
         <div className="w-2 h-2 rounded-full bg-blue-400"></div>
-        <span className="font-medium">AlphaCore AI</span>
+        <span className="font-medium">CodeSentinel AI</span>
         <ChevronDown size={14} className="text-[#5a5a72]" />
       </button>
 
@@ -66,9 +66,9 @@ export default function Navbar({ activeScreen }) {
         </button>
         <div className="flex items-center gap-2 cursor-pointer">
           <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center text-xs font-bold text-white">
-            AR
+            H
           </div>
-          <span className="text-sm text-[#aaaacc] font-medium">Alex R.</span>
+          <span className="text-sm text-[#aaaacc] font-medium">Huzaifa S.</span>
           <ChevronDown size={14} className="text-[#5a5a72]" />
         </div>
       </div>
